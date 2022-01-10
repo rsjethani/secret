@@ -9,7 +9,7 @@ const DefaultRedact string = "*****"
 
 type Secret struct {
 	v *string
-	r string
+	r *string
 }
 
 func New(s string, options ...func(*Secret)) Secret {
@@ -26,17 +26,18 @@ func New(s string, options ...func(*Secret)) Secret {
 
 func (s *Secret) init() {
 	s.v = new(string)
-	s.r = DefaultRedact
+	s.r = new(string)
+	*s.r = DefaultRedact
 }
 
 func CustomRedact(r string) func(*Secret) {
 	return func(s *Secret) {
-		s.r = r
+		*s.r = r
 	}
 }
 
 func (s Secret) String() string {
-	return s.r
+	return *s.r
 }
 
 func (s Secret) Value() string {
@@ -44,7 +45,7 @@ func (s Secret) Value() string {
 }
 
 func (s Secret) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, s.r)), nil
+	return []byte(fmt.Sprintf(`"%s"`, *s.r)), nil
 }
 
 func (s *Secret) UnmarshalJSON(b []byte) error {
@@ -53,9 +54,13 @@ func (s *Secret) UnmarshalJSON(b []byte) error {
 }
 
 func Redacted(s *Secret) {
-	s.r = "[REDACTED]"
+	*s.r = "[REDACTED]"
 }
 
 func FiveXs(s *Secret) {
-	s.r = "XXXXX"
+	*s.r = "XXXXX"
+}
+
+func (s *Secret) Copy() Secret {
+	return New(*s.v, CustomRedact(*s.r))
 }
