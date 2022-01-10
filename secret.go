@@ -1,6 +1,9 @@
 package secret
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 const DefaultRedact string = "*****"
 
@@ -10,17 +13,20 @@ type Secret struct {
 }
 
 func New(s string, options ...func(*Secret)) Secret {
-	sec := Secret{
-		v: new(string),
-		r: DefaultRedact,
-	}
+	sec := Secret{}
 
+	sec.init()
 	*sec.v = s
 
 	for _, opt := range options {
 		opt(&sec)
 	}
 	return sec
+}
+
+func (s *Secret) init() {
+	s.v = new(string)
+	s.r = DefaultRedact
 }
 
 func CustomRedact(r string) func(*Secret) {
@@ -39,6 +45,11 @@ func (s Secret) Value() string {
 
 func (s Secret) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.r)), nil
+}
+
+func (s *Secret) UnmarshalJSON(b []byte) error {
+	s.init()
+	return json.Unmarshal(b, s.v)
 }
 
 func Redacted(s *Secret) {
