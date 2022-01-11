@@ -7,13 +7,13 @@ import (
 
 const DefaultRedact string = "*****"
 
-type Secret struct {
+type Text struct {
 	v *string
 	r *string
 }
 
-func New(s string, options ...func(*Secret)) Secret {
-	sec := Secret{}
+func NewText(s string, options ...func(*Text)) Text {
+	sec := Text{}
 
 	sec.init()
 	*sec.v = s
@@ -24,43 +24,43 @@ func New(s string, options ...func(*Secret)) Secret {
 	return sec
 }
 
-func (s *Secret) init() {
+func (s *Text) init() {
 	s.v = new(string)
 	s.r = new(string)
 	*s.r = DefaultRedact
 }
 
-func CustomRedact(r string) func(*Secret) {
-	return func(s *Secret) {
+func CustomRedact(r string) func(*Text) {
+	return func(s *Text) {
 		*s.r = r
 	}
 }
 
-func (s Secret) String() string {
+func (s Text) String() string {
 	return *s.r
 }
 
-func (s Secret) Value() string {
+func (s Text) Value() string {
 	return *s.v
 }
 
-func (s Secret) MarshalJSON() ([]byte, error) {
+func (s Text) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, *s.r)), nil
 }
 
-func (s *Secret) UnmarshalJSON(b []byte) error {
+func (s *Text) UnmarshalJSON(b []byte) error {
 	s.init()
 	return json.Unmarshal(b, s.v)
 }
 
-func Redacted(s *Secret) {
+func Redacted(s *Text) {
 	*s.r = "[REDACTED]"
 }
 
-func FiveXs(s *Secret) {
+func FiveXs(s *Text) {
 	*s.r = "XXXXX"
 }
 
-func (s *Secret) Copy() Secret {
-	return New(*s.v, CustomRedact(*s.r))
+func (s *Text) Copy() Text {
+	return NewText(*s.v, CustomRedact(*s.r))
 }

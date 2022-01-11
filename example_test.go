@@ -10,18 +10,18 @@ import (
 func Example() {
 	type login struct {
 		User      string
-		Password1 secret.Secret
-		Password2 secret.Secret
-		Password3 secret.Secret
-		Password4 secret.Secret
+		Password1 secret.Text
+		Password2 secret.Text
+		Password3 secret.Text
+		Password4 secret.Text
 	}
 
 	x := login{
 		User:      "John",
-		Password1: secret.New("pass1"),
-		Password2: secret.New("pass2", secret.Redacted),
-		Password3: secret.New("pass3", secret.FiveXs),
-		Password4: secret.New("pass4", secret.CustomRedact("^^^^^")),
+		Password1: secret.NewText("pass1"),
+		Password2: secret.NewText("pass2", secret.Redacted),
+		Password3: secret.NewText("pass3", secret.FiveXs),
+		Password4: secret.NewText("pass4", secret.CustomRedact("^^^^^")),
 	}
 
 	bytes, err := json.Marshal(x)
@@ -37,7 +37,7 @@ func Example() {
 	// Unmarshaling a plain string into a Secret also works.
 	y := struct {
 		User       string
-		Credential secret.Secret
+		Credential secret.Text
 	}{}
 	err = json.Unmarshal([]byte(`{"User": "Doe", "Credential": "secret"}`), &y)
 	if err != nil {
