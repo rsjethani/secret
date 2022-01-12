@@ -60,7 +60,3 @@ func Redacted(s *Text) {
 func FiveXs(s *Text) {
 	*s.r = "XXXXX"
 }
-
-func (s *Text) Copy() Text {
-	return NewText(*s.v, CustomRedact(*s.r))
-}
