@@ -7,48 +7,62 @@ import (
 	"github.com/rsjethani/secret/v2"
 )
 
-func Example() {
-	type login struct {
-		User      string
-		Password1 secret.Text
-		Password2 secret.Text
-		Password3 secret.Text
-		Password4 secret.Text
+func ExampleNewText() {
+	s := secret.NewText("$ecre!")
+	fmt.Println(s, s.Value())
+	//Output: ***** $ecre!
+}
+
+func ExampleFiveXs() {
+	s := secret.NewText("$ecre!", secret.FiveXs)
+	fmt.Println(s, s.Value())
+	// Output: XXXXX $ecre!
+}
+
+func ExampleRedacted() {
+	s := secret.NewText("$ecre!", secret.Redacted)
+	fmt.Println(s, s.Value())
+	// Output: [REDACTED] $ecre!
+}
+
+func ExampleCustomRedact() {
+	s := secret.NewText("$ecre!", secret.CustomRedact("HIDDEN"))
+	fmt.Println(s, s.Value())
+	// Output: HIDDEN $ecre!
+}
+
+func ExampleText_MarshalJSON() {
+	login := struct {
+		User     string
+		Password secret.Text
+	}{
+		User:     "John",
+		Password: secret.NewText("shh!"),
 	}
 
-	x := login{
-		User:      "John",
-		Password1: secret.NewText("pass1"),
-		Password2: secret.NewText("pass2", secret.Redacted),
-		Password3: secret.NewText("pass3", secret.FiveXs),
-		Password4: secret.NewText("pass4", secret.CustomRedact("^^^^^")),
-	}
-
-	bytes, err := json.Marshal(x)
+	bytes, err := json.Marshal(&login)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", x)
-	fmt.Printf("%v, %v, %v, %v\n", x.Password1, x.Password2, x.Password3, x.Password4)
-	fmt.Printf("%v, %v, %v, %v\n", x.Password1.Value(), x.Password2.Value(), x.Password3.Value(), x.Password4.Value())
-	fmt.Printf("%v\n", string(bytes))
+	fmt.Println(string(bytes))
+	// Output: {"User":"John","Password":"*****"}
+}
 
-	// Unmarshaling a plain string into a Secret also works.
-	y := struct {
-		User       string
-		Credential secret.Text
+func ExampleText_UnmarshalJSON() {
+	login := struct {
+		User     string
+		Password secret.Text
 	}{}
-	err = json.Unmarshal([]byte(`{"User": "Doe", "Credential": "secret"}`), &y)
+
+	err := json.Unmarshal([]byte(`{"User":"John","Password":"$ecre!"}`), &login)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v\n", y.Credential.Value())
 
+	fmt.Printf("%+v\n", login)
+	fmt.Println(login.Password.Value())
 	// Output:
-	// {User:John Password1:***** Password2:[REDACTED] Password3:XXXXX Password4:^^^^^}
-	// *****, [REDACTED], XXXXX, ^^^^^
-	// pass1, pass2, pass3, pass4
-	// {"User":"John","Password1":"*****","Password2":"[REDACTED]","Password3":"XXXXX","Password4":"^^^^^"}
-	// secret
+	// {User:John Password:*****}
+	// $ecre!
 }
