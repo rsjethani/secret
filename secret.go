@@ -1,3 +1,7 @@
+// Package secret provides types to guard your secret values from leaking into logs, std* etc.
+//
+// The objective is to disallow writing/serializing of secret values to std*, logs, JSON string
+// etc. but provide access to the secret when requested explicitly.
 package secret
 
 import (
@@ -8,7 +12,8 @@ import (
 // DefaultRedact is used by default if no other redact hint is given.
 const DefaultRedact string = "*****"
 
-// Text provides a way to store your secret value and a corresponding redact hint.
+// Text provides a way safely to store your secret value and a corresponding redact hint. By
+// default this redact hint is returned for operations like printing and serializing.
 type Text struct {
 	// v is the actual secret values.
 	v *string
@@ -36,7 +41,7 @@ func NewText(s string, options ...func(*Text)) Text {
 }
 
 // String implements the fmt.Stringer interface and returns only the redact hint. This prevents the
-// secret value from being to std*, logs etc.
+// secret value from being printed to std*, logs etc.
 func (s Text) String() string {
 	return *s.r
 }
@@ -71,17 +76,17 @@ func (s *Text) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Redacted sets "[REDACTED]" as the redact hint.
+// Redacted option sets "[REDACTED]" as the redact hint.
 func Redacted(s *Text) {
 	*s.r = "[REDACTED]"
 }
 
-// FiveXs sets "XXXXX" as the redact hint.
+// FiveXs option sets "XXXXX" as the redact hint.
 func FiveXs(s *Text) {
 	*s.r = "XXXXX"
 }
 
-// CustomRedact sets the value of r as the redact hint.
+// CustomRedact option sets the value of r as the redact hint.
 func CustomRedact(r string) func(*Text) {
 	return func(s *Text) {
 		*s.r = r
