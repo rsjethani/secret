@@ -1,4 +1,6 @@
-[![Coverage](https://gocover.io/_badge/github.com/rsjethani/secret)](https://gocover.io/github.com/rsjethani/secret) [![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/rsjethani/secret/v2)
+[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/rsjethani/secret/v2)
+[![Build Status](https://github.com/rsjethani/secret/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/rsjethani/secret/actions)
+
 # secret v2
 
 ### What secret is?
