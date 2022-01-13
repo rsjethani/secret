@@ -4,7 +4,14 @@
 # secret v2
 
 ### What secret is?
-- It provides simple Go types like [secret.Text](https://pkg.go.dev/github.com/rsjethani/secret/v2#Text) to encapsulate your secret.
+- It provides simple Go types like [secret.Text](https://pkg.go.dev/github.com/rsjethani/secret/v2#Text) to encapsulate your secret. Example:
+```
+type Login struct {
+    User string
+    Password secret.Text
+}
+```
+See godev reference for more examples and usage information.
 - The encapsulated secret remains inaccessible to operations like printing, logging, and JSON serializtion, a redact hint like `*****` is returned instead.
 - The only way to access the actual secret value is by asking explicitly via the `.Value()` method.
 
@@ -17,7 +24,4 @@
 go get github.com/rsjethani/secret/v2
 ```
 NOTE: v1 is deprectated now.
-
-### Usage
-See godoc reference for usage examples.
 
