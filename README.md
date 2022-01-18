@@ -12,9 +12,9 @@ type Login struct {
     Password secret.Text
 }
 ```
-See godev reference for more examples and usage information.
-- The encapsulated secret remains inaccessible to operations like printing, logging, and JSON serializtion, a redact hint like `*****` is returned instead.
+- The encapsulated secret remains inaccessible to operations like printing, logging, JSON serializtion etc. A (customizable) redact hint like `*****` is returned instead.
 - The only way to access the actual secret value is by asking explicitly via the `.Value()` method.
+- See [godev reference](https://pkg.go.dev/github.com/rsjethani/secret/v2#pkg-examples) for usage examples.
 
 ### What secret is not?
 - It is not a secret management service or your local password manager.
