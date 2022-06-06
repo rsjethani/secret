@@ -24,5 +24,5 @@ type Login struct {
 ```
 go get github.com/rsjethani/secret/v2
 ```
-NOTE: v1 is deprectated now.
+NOTE: v1 is deprecated now.
 
