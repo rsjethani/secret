@@ -66,3 +66,14 @@ func ExampleText_UnmarshalJSON() {
 	// {User:John Password:*****}
 	// $ecre!
 }
+
+func ExampleText_Equals() {
+	s1 := secret.NewText("hello")
+	s2 := secret.NewText("hello")
+	s3 := secret.NewText("hi")
+	fmt.Println(s1.Equals(s2))
+	fmt.Println(s1.Equals(s3))
+	// Output:
+	// true
+	// false
+}
