@@ -76,6 +76,11 @@ func (s *Text) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Equals checks whether s2 has same secret string or not.
+func (s *Text) Equals(s2 Text) bool {
+	return *s.v == *s2.v
+}
+
 // Redacted option sets "[REDACTED]" as the redact hint.
 func Redacted(s *Text) {
 	*s.r = "[REDACTED]"
