@@ -12,8 +12,9 @@ import (
 // DefaultRedact is used by default if no other redact hint is given.
 const DefaultRedact string = "*****"
 
-// Text provides a way safely to store your secret value and a corresponding redact hint. By
-// default this redact hint is returned for operations like printing and serializing.
+// Text provides a way to safely store your secret value and a corresponding redact hint. This
+// redact hint what is used in operations like printing and serializing. The default
+// value of Text is usable.
 type Text struct {
 	// v is the actual secret values.
 	v *string
@@ -43,11 +44,17 @@ func NewText(s string, options ...func(*Text)) Text {
 // String implements the fmt.Stringer interface and returns only the redact hint. This prevents the
 // secret value from being printed to std*, logs etc.
 func (s Text) String() string {
+	if s.r == nil {
+		return DefaultRedact
+	}
 	return *s.r
 }
 
 // Value gives you access to the actual secret value stored inside Text.
 func (s Text) Value() string {
+	if s.v == nil {
+		return ""
+	}
 	return *s.v
 }
 
