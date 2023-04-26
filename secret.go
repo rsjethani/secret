@@ -58,6 +58,22 @@ func (s Text) Value() string {
 	return *s.v
 }
 
+func (s Text) MarshalText() ([]byte, error) {
+	return []byte(*s.r), nil
+}
+
+func (s *Text) UnmarshalText(t []byte) error {
+	v := string(t)
+
+	// If the original redact is not nil then use it otherwise fallback to default.
+	if s.r != nil {
+		*s = NewText(v, CustomRedact(*s.r))
+	} else {
+		*s = NewText(v)
+	}
+	return nil
+}
+
 // MarshalJSON allows Text to be serialized into a JSON string. Only the redact hint is part of the
 // the JSON string.
 func (s Text) MarshalJSON() ([]byte, error) {
