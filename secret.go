@@ -62,8 +62,8 @@ func (s Text) MarshalText() ([]byte, error) {
 	return []byte(*s.r), nil
 }
 
-func (s *Text) UnmarshalText(t []byte) error {
-	v := string(t)
+func (s *Text) UnmarshalText(b []byte) error {
+	v := string(b)
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if s.r != nil {

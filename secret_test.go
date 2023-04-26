@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestTextUnmarshalJSON_allocates_new_data_rather_than_overwriting_existing(t *testing.T) {
+func TestText_UnmarshalJSON_allocates_new_data_rather_than_overwriting_existing(t *testing.T) {
 	s1 := NewText("hello")
 
 	oldRedact := s1.r
