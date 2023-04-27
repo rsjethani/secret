@@ -58,6 +58,26 @@ func (s Text) Value() string {
 	return *s.v
 }
 
+// MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than the actual
+// secret value.
+func (s Text) MarshalText() ([]byte, error) {
+	return []byte(*s.r), nil
+}
+
+// UnmarshalText implements [encoding.TextUnmarshaler]. It unmarshals b into receiver's new secret value.
+// If redact string is present then it is reused otherwise [DefaultRedact] is used.
+func (s *Text) UnmarshalText(b []byte) error {
+	v := string(b)
+
+	// If the original redact is not nil then use it otherwise fallback to default.
+	if s.r != nil {
+		*s = NewText(v, CustomRedact(*s.r))
+	} else {
+		*s = NewText(v)
+	}
+	return nil
+}
+
 // MarshalJSON allows Text to be serialized into a JSON string. Only the redact hint is part of the
 // the JSON string.
 func (s Text) MarshalJSON() ([]byte, error) {

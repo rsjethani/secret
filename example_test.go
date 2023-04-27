@@ -10,13 +10,13 @@ import (
 func ExampleText() {
 	s := secret.Text{}
 	fmt.Println(s, s.Value())
-	//Output: *****
+	// Output: *****
 }
 
 func ExampleNewText() {
 	s := secret.NewText("$ecre!")
 	fmt.Println(s, s.Value())
-	//Output: ***** $ecre!
+	// Output: ***** $ecre!
 }
 
 func ExampleFiveXs() {
@@ -35,6 +35,29 @@ func ExampleCustomRedact() {
 	s := secret.NewText("$ecre!", secret.CustomRedact("HIDDEN"))
 	fmt.Println(s, s.Value())
 	// Output: HIDDEN $ecre!
+}
+
+func ExampleText_MarshalText() {
+	sec := secret.NewText("secret!")
+	bytes, err := sec.MarshalText()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(bytes))
+	// Output: *****
+}
+
+func ExampleText_UnmarshalText() {
+	sec := secret.Text{}
+
+	err := sec.UnmarshalText([]byte(`$ecre!`))
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(sec, sec.Value())
+	// Output: ***** $ecre!
 }
 
 func ExampleText_MarshalJSON() {
