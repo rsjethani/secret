@@ -13,32 +13,32 @@ func ExampleText() {
 	// Output: *****
 }
 
-func ExampleNewText() {
-	s := secret.NewText("$ecre!")
+func ExampleNew() {
+	s := secret.New("$ecre!")
 	fmt.Println(s, s.Value())
 	// Output: ***** $ecre!
 }
 
 func ExampleFiveXs() {
-	s := secret.NewText("$ecre!", secret.FiveXs)
+	s := secret.New("$ecre!", secret.FiveXs)
 	fmt.Println(s, s.Value())
 	// Output: XXXXX $ecre!
 }
 
 func ExampleRedacted() {
-	s := secret.NewText("$ecre!", secret.Redacted)
+	s := secret.New("$ecre!", secret.Redacted)
 	fmt.Println(s, s.Value())
 	// Output: [REDACTED] $ecre!
 }
 
 func ExampleCustomRedact() {
-	s := secret.NewText("$ecre!", secret.CustomRedact("HIDDEN"))
+	s := secret.New("$ecre!", secret.CustomRedact("HIDDEN"))
 	fmt.Println(s, s.Value())
 	// Output: HIDDEN $ecre!
 }
 
 func ExampleText_MarshalText() {
-	sec := secret.NewText("secret!")
+	sec := secret.New("secret!")
 	bytes, err := sec.MarshalText()
 	if err != nil {
 		panic(err)
@@ -66,7 +66,7 @@ func ExampleText_MarshalJSON() {
 		Password secret.Text
 	}{
 		User:     "John",
-		Password: secret.NewText("shh!"),
+		Password: secret.New("shh!"),
 	}
 
 	bytes, err := json.Marshal(&login)
@@ -97,9 +97,9 @@ func ExampleText_UnmarshalJSON() {
 }
 
 func ExampleText_Equals() {
-	s1 := secret.NewText("hello")
-	s2 := secret.NewText("hello")
-	s3 := secret.NewText("hi")
+	s1 := secret.New("hello")
+	s2 := secret.New("hello")
+	s3 := secret.New("hi")
 	fmt.Println(s1.Equals(s2))
 	fmt.Println(s1.Equals(s3))
 	// Output:
