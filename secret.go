@@ -9,9 +9,6 @@ import (
 	"fmt"
 )
 
-// DefaultRedact is used by default if no other redact hint is given.
-const DefaultRedact string = "*****"
-
 // Text provides a way to safely store your secret value and a corresponding redact hint. This
 // redact hint what is used in operations like printing and serializing. The default
 // value of Text is usable.
@@ -22,16 +19,16 @@ type Text struct {
 	r *string
 }
 
-// New creates a new Text instance with s as the secret value. Multiple option functions can
-// be passed to alter default behavior.
-func New(s string, options ...func(*Text)) Text {
+// New returns [Text] for the secret with `*****` as the redact hint.
+// Multiple option functions can be passed to alter default behavior.
+func New(secret string, options ...func(*Text)) Text {
 	sec := Text{
 		v: new(string),
 		r: new(string),
 	}
 
-	*sec.v = s
-	*sec.r = DefaultRedact
+	*sec.v = secret
+	*sec.r = defaultRedact
 
 	// Apply options to override defaults
 	for _, opt := range options {
@@ -41,11 +38,14 @@ func New(s string, options ...func(*Text)) Text {
 	return sec
 }
 
+// defaultRedact is used if no other redact hint is given.
+const defaultRedact string = "*****"
+
 // String implements the fmt.Stringer interface and returns only the redact hint. This prevents the
 // secret value from being printed to std*, logs etc.
 func (s Text) String() string {
 	if s.r == nil {
-		return DefaultRedact
+		return defaultRedact
 	}
 	return *s.r
 }
