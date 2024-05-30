@@ -4,11 +4,6 @@
 // etc. but provide access to the secret when requested explicitly.
 package secret
 
-import (
-	"encoding/json"
-	"fmt"
-)
-
 // Text provides a way to safely store your secret value and a corresponding redact hint. This
 // redact hint what is used in operations like printing and serializing. The default
 // value of Text is usable.
@@ -58,14 +53,14 @@ func (s Text) Value() string {
 	return *s.v
 }
 
-// MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than the actual
-// secret value.
+// MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
+// the actual secret value.
 func (s Text) MarshalText() ([]byte, error) {
 	return []byte(*s.r), nil
 }
 
-// UnmarshalText implements [encoding.TextUnmarshaler]. It unmarshals b into receiver's new secret value.
-// If redact string is present then it is reused otherwise [DefaultRedact] is used.
+// UnmarshalText implements [encoding.TextUnmarshaler]. It unmarshals b into receiver's new secret
+// value. If redact string is present then it is reused.
 func (s *Text) UnmarshalText(b []byte) error {
 	v := string(b)
 
@@ -75,31 +70,6 @@ func (s *Text) UnmarshalText(b []byte) error {
 	} else {
 		*s = New(v)
 	}
-	return nil
-}
-
-// MarshalJSON allows Text to be serialized into a JSON string. Only the redact hint is part of the
-// the JSON string.
-func (s Text) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, *s.r)), nil
-}
-
-// UnmarshalJSON allows a JSON string to be deserialized into a Text value. DefaultRedact is set
-// as the redact hint.
-func (s *Text) UnmarshalJSON(b []byte) error {
-	// Get the new secret value from unmarshalled data.
-	var n string
-	if err := json.Unmarshal(b, &n); err != nil {
-		return err
-	}
-
-	// If the original redact is not nil then use it otherwise fallback to default.
-	if s.r != nil {
-		*s = New(n, CustomRedact(*s.r))
-	} else {
-		*s = New(n)
-	}
-
 	return nil
 }
 
