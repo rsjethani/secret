@@ -38,29 +38,6 @@ func ExampleCustomRedact() {
 }
 
 func ExampleText_MarshalText() {
-	sec := secret.New("secret!")
-	bytes, err := sec.MarshalText()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(bytes))
-	// Output: *****
-}
-
-func ExampleText_UnmarshalText() {
-	sec := secret.Text{}
-
-	err := sec.UnmarshalText([]byte(`$ecre!`))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(sec, sec.Value())
-	// Output: ***** $ecre!
-}
-
-func ExampleText_MarshalJSON() {
 	login := struct {
 		User     string
 		Password secret.Text
@@ -78,7 +55,7 @@ func ExampleText_MarshalJSON() {
 	// Output: {"User":"John","Password":"*****"}
 }
 
-func ExampleText_UnmarshalJSON() {
+func ExampleText_UnmarshalText() {
 	login := struct {
 		User     string
 		Password secret.Text
