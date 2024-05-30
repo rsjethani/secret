@@ -22,9 +22,9 @@ type Text struct {
 	r *string
 }
 
-// NewText creates a new Text instance with s as the secret value. Multiple option functions can
+// New creates a new Text instance with s as the secret value. Multiple option functions can
 // be passed to alter default behavior.
-func NewText(s string, options ...func(*Text)) Text {
+func New(s string, options ...func(*Text)) Text {
 	sec := Text{
 		v: new(string),
 		r: new(string),
@@ -71,9 +71,9 @@ func (s *Text) UnmarshalText(b []byte) error {
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if s.r != nil {
-		*s = NewText(v, CustomRedact(*s.r))
+		*s = New(v, CustomRedact(*s.r))
 	} else {
-		*s = NewText(v)
+		*s = New(v)
 	}
 	return nil
 }
@@ -95,9 +95,9 @@ func (s *Text) UnmarshalJSON(b []byte) error {
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if s.r != nil {
-		*s = NewText(n, CustomRedact(*s.r))
+		*s = New(n, CustomRedact(*s.r))
 	} else {
-		*s = NewText(n)
+		*s = New(n)
 	}
 
 	return nil
