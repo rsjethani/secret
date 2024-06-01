@@ -1,4 +1,4 @@
-[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/rsjethani/secret/v2)
+[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/rsjethani/secret/v3)
 [![Build Status](https://github.com/rsjethani/secret/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/rsjethani/secret/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rsjethani/secret)](https://goreportcard.com/report/github.com/rsjethani/secret)
 
