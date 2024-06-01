@@ -7,22 +7,20 @@ package secret
 // Text provides a way to safely store your secret value and a corresponding redact hint. This
 // redact hint is what is used in operations like printing and serializing.
 type Text struct {
-	// v is the actual secret values.
-	v *string
-	// r is the redact hint to be used in place of secret.
-	r *string
+	secret *string
+	redact *string
 }
 
 // New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
 // like [RedactHint] to modify default behavior.
 func New(secret string, options ...func(*Text)) Text {
 	tx := Text{
-		v: new(string),
-		r: new(string),
+		secret: new(string),
+		redact: new(string),
 	}
 
-	*tx.v = secret
-	*tx.r = FiveStar
+	*tx.secret = secret
+	*tx.redact = FiveStar
 
 	for _, o := range options {
 		o(&tx)
@@ -42,25 +40,25 @@ const (
 // the common redact hints provided with this package like [FiveX] or provide your own string.
 func RedactHint(r string) func(*Text) {
 	return func(t *Text) {
-		*t.r = r
+		*t.redact = r
 	}
 }
 
 // String implements the [fmt.Stringer] interface and returns only the redact hint. This prevents the
 // secret value from being printed to std*, logs etc.
 func (tx Text) String() string {
-	if tx.r == nil {
+	if tx.redact == nil {
 		return FiveStar
 	}
-	return *tx.r
+	return *tx.redact
 }
 
 // Value gives you access to the actual secret value stored inside Text.
 func (tx Text) Value() string {
-	if tx.v == nil {
+	if tx.secret == nil {
 		return ""
 	}
-	return *tx.v
+	return *tx.secret
 }
 
 // MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
@@ -75,15 +73,15 @@ func (tx *Text) UnmarshalText(b []byte) error {
 	s := string(b)
 
 	// If the original redact is not nil then use it otherwise fallback to default.
-	if tx.r != nil {
-		*tx = New(s, RedactHint(*tx.r))
+	if tx.redact != nil {
+		*tx = New(s, RedactHint(*tx.redact))
 	} else {
 		*tx = New(s)
 	}
 	return nil
 }
 
-// Equals checks whether s2 has same secret string or not.
-func (tx *Text) Equals(s2 Text) bool {
-	return *tx.v == *s2.v
+// Equal returns true if both arguments have the same secret. The redact strings are not considered.
+func Equal(tx1, tx2 Text) bool {
+	return *tx1.secret == *tx2.secret
 }

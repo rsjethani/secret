@@ -75,12 +75,12 @@ func ExampleText_UnmarshalText() {
 	// $ecre!
 }
 
-func ExampleText_Equals() {
-	s1 := secret.New("hello")
-	s2 := secret.New("hello")
-	s3 := secret.New("hi")
-	fmt.Println(s1.Equals(s2))
-	fmt.Println(s1.Equals(s3))
+func ExampleEqual() {
+	tx1 := secret.New("hello")
+	tx2 := secret.New("hello", secret.RedactHint(secret.Redacted))
+	tx3 := secret.New("world")
+	fmt.Println(secret.Equal(tx1, tx2))
+	fmt.Println(secret.Equal(tx1, tx3))
 
 	// Output:
 	// true
