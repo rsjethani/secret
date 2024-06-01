@@ -1,14 +1,20 @@
-// Package secret provides types to guard your secret values from leaking into logs, std* etc.
-//
-// The objective is to disallow writing/serializing of secret values to std*, logs, JSON string
-// etc. but provide access to the secret when requested explicitly.
 package secret
 
-// Text provides a way to safely store your secret value and a corresponding redact hint. This
-// redact hint is what is used in operations like printing and serializing.
+// Text provides a way to safely store your secret string along with a proxy/redact string. This
+// redact string is what is used in operations like printing and serializing there by avoiding
+// leaking the secret. Once created, the instance is readonly except for the [Text.UnmarshalText]
+// operation, but that too only modifies the local copy. Hence the type is concurrent safe.
 type Text struct {
 	secret *string
 	redact *string
+}
+
+// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
+// the common redact hints provided with this package like [FiveX] or provide your own string.
+func RedactHint(r string) func(*Text) {
+	return func(t *Text) {
+		*t.redact = r
+	}
 }
 
 // New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
@@ -35,14 +41,6 @@ const (
 	FiveStar string = "*****"
 	Redacted string = "[REDACTED]"
 )
-
-// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
-// the common redact hints provided with this package like [FiveX] or provide your own string.
-func RedactHint(r string) func(*Text) {
-	return func(t *Text) {
-		*t.redact = r
-	}
-}
 
 // String implements the [fmt.Stringer] interface and returns only the redact string. This prevents
 // the actual secret string from being sent to std*, logs etc.
