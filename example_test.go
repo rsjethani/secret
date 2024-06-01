@@ -9,20 +9,20 @@ import (
 
 func ExampleNew() {
 	s := secret.New("$ecre!")
-	fmt.Println(s, s.Value())
+	fmt.Println(s, s.Secret())
 
 	// Output: ***** $ecre!
 }
 
 func ExampleRedactAs() {
 	s := secret.New("$ecre!", secret.RedactAs(secret.FiveX))
-	fmt.Println(s, s.Value())
+	fmt.Println(s, s.Secret())
 
 	s = secret.New("$ecre!", secret.RedactAs(secret.Redacted))
-	fmt.Println(s, s.Value())
+	fmt.Println(s, s.Secret())
 
 	s = secret.New("$ecre!", secret.RedactAs("my redact hint"))
-	fmt.Println(s, s.Value())
+	fmt.Println(s, s.Secret())
 
 	// Output:
 	// XXXXX $ecre!
@@ -61,7 +61,7 @@ func ExampleText_UnmarshalText() {
 	}
 
 	fmt.Printf("%+v\n", login)
-	fmt.Println(login.Password.Value())
+	fmt.Println(login.Password.Secret())
 
 	// Output:
 	// {User:John Password:*****}

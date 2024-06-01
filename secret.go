@@ -1,20 +1,12 @@
 package secret
 
-// Text provides a way to safely store your secret string along with a proxy/redact string. This
-// redact string is what is used in operations like printing and serializing there by avoiding
-// leaking the secret. Once created, the instance is readonly except for the [Text.UnmarshalText]
-// operation, but that too only modifies the local copy. Hence the type is concurrent safe.
+// Text provides a way to safely store your secret string until you actually need it. Operations
+// like printing and serializing see a proxy/redact string there by avoiding leaking the secret.
+// Once created, the instance is readonly except for the [Text.UnmarshalText] operation, but that
+// too only modifies the local copy. Hence the type is concurrent safe.
 type Text struct {
 	secret *string
 	redact *string
-}
-
-// RedactAs is a functional option to set r as the redact string for [Text]. You can use one of
-// the common redact strings provided with this package like [FiveX] or provide your own.
-func RedactAs(r string) func(*Text) {
-	return func(t *Text) {
-		*t.redact = r
-	}
 }
 
 // New returns [Text] for the secret with [FiveStar] as the default redact string. Provide options
@@ -35,7 +27,15 @@ func New(secret string, options ...func(*Text)) Text {
 	return tx
 }
 
-// Some common redact hints.
+// RedactAs is a functional option to set r as the redact string for [Text]. You can use one of
+// the common redact strings provided with this package like [FiveX] or provide your own.
+func RedactAs(r string) func(*Text) {
+	return func(t *Text) {
+		*t.redact = r
+	}
+}
+
+// Some common redact strings.
 const (
 	FiveX    string = "XXXXX"
 	FiveStar string = "*****"
@@ -51,8 +51,8 @@ func (tx Text) String() string {
 	return FiveStar
 }
 
-// Value gives you access to the secret string stored inside [Text].
-func (tx Text) Value() string {
+// Secret returns the actual secret string stored inside [Text].
+func (tx Text) Secret() string {
 	if tx.secret != nil {
 		return *tx.secret
 	}
