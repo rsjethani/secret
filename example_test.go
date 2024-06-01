@@ -7,13 +7,6 @@ import (
 	"github.com/rsjethani/secret/v2"
 )
 
-func ExampleText() {
-	s := secret.Text{}
-	fmt.Println(s, s.Value())
-
-	// Output: *****
-}
-
 func ExampleNew() {
 	s := secret.New("$ecre!")
 	fmt.Println(s, s.Value())
