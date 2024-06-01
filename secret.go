@@ -5,8 +5,7 @@
 package secret
 
 // Text provides a way to safely store your secret value and a corresponding redact hint. This
-// redact hint what is used in operations like printing and serializing. The default
-// value of Text is usable.
+// redact hint is what is used in operations like printing and serializing.
 type Text struct {
 	// v is the actual secret values.
 	v *string
@@ -14,83 +13,77 @@ type Text struct {
 	r *string
 }
 
-// New returns [Text] for the secret with `*****` as the redact hint.
-// Multiple option functions can be passed to alter default behavior.
+// New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
+// like [RedactHint] to modify default behavior.
 func New(secret string, options ...func(*Text)) Text {
-	sec := Text{
+	tx := Text{
 		v: new(string),
 		r: new(string),
 	}
 
-	*sec.v = secret
-	*sec.r = defaultRedact
+	*tx.v = secret
+	*tx.r = FiveStar
 
-	// Apply options to override defaults
-	for _, opt := range options {
-		opt(&sec)
+	for _, o := range options {
+		o(&tx)
 	}
 
-	return sec
+	return tx
 }
 
-// defaultRedact is used if no other redact hint is given.
-const defaultRedact string = "*****"
+// Some common redact hints.
+const (
+	FiveX    string = "XXXXX"
+	FiveStar string = "*****"
+	Redacted string = "[REDACTED]"
+)
 
-// String implements the fmt.Stringer interface and returns only the redact hint. This prevents the
-// secret value from being printed to std*, logs etc.
-func (s Text) String() string {
-	if s.r == nil {
-		return defaultRedact
+// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
+// the common redact hints provided with this package like [FiveX] or provide your own string.
+func RedactHint(r string) func(*Text) {
+	return func(t *Text) {
+		*t.r = r
 	}
-	return *s.r
+}
+
+// String implements the [fmt.Stringer] interface and returns only the redact hint. This prevents the
+// secret value from being printed to std*, logs etc.
+func (tx Text) String() string {
+	if tx.r == nil {
+		return FiveStar
+	}
+	return *tx.r
 }
 
 // Value gives you access to the actual secret value stored inside Text.
-func (s Text) Value() string {
-	if s.v == nil {
+func (tx Text) Value() string {
+	if tx.v == nil {
 		return ""
 	}
-	return *s.v
+	return *tx.v
 }
 
 // MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
 // the actual secret value.
-func (s Text) MarshalText() ([]byte, error) {
-	return []byte(*s.r), nil
+func (tx Text) MarshalText() ([]byte, error) {
+	return []byte(tx.String()), nil
 }
 
 // UnmarshalText implements [encoding.TextUnmarshaler]. It unmarshals b into receiver's new secret
 // value. If redact string is present then it is reused.
-func (s *Text) UnmarshalText(b []byte) error {
-	v := string(b)
+func (tx *Text) UnmarshalText(b []byte) error {
+	s := string(b)
 
 	// If the original redact is not nil then use it otherwise fallback to default.
-	if s.r != nil {
-		*s = New(v, CustomRedact(*s.r))
+	if tx.r != nil {
+		*tx = New(s, RedactHint(*tx.r))
 	} else {
-		*s = New(v)
+		*tx = New(s)
 	}
 	return nil
 }
 
 // Equals checks whether s2 has same secret string or not.
-func (s *Text) Equals(s2 Text) bool {
-	return *s.v == *s2.v
-}
-
-// Redacted option sets "[REDACTED]" as the redact hint.
-func Redacted(s *Text) {
-	*s.r = "[REDACTED]"
-}
-
-// FiveXs option sets "XXXXX" as the redact hint.
-func FiveXs(s *Text) {
-	*s.r = "XXXXX"
-}
-
-// CustomRedact option sets the value of r as the redact hint.
-func CustomRedact(r string) func(*Text) {
-	return func(s *Text) {
-		*s.r = r
-	}
+func (tx *Text) Equals(s2 Text) bool {
+	return *tx.v == *s2.v
 }

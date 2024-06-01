@@ -10,31 +10,31 @@ import (
 func ExampleText() {
 	s := secret.Text{}
 	fmt.Println(s, s.Value())
+
 	// Output: *****
 }
 
 func ExampleNew() {
 	s := secret.New("$ecre!")
 	fmt.Println(s, s.Value())
+
 	// Output: ***** $ecre!
 }
 
-func ExampleFiveXs() {
-	s := secret.New("$ecre!", secret.FiveXs)
+func ExampleRedactHint() {
+	s := secret.New("$ecre!", secret.RedactHint(secret.FiveX))
 	fmt.Println(s, s.Value())
-	// Output: XXXXX $ecre!
-}
 
-func ExampleRedacted() {
-	s := secret.New("$ecre!", secret.Redacted)
+	s = secret.New("$ecre!", secret.RedactHint(secret.Redacted))
 	fmt.Println(s, s.Value())
-	// Output: [REDACTED] $ecre!
-}
 
-func ExampleCustomRedact() {
-	s := secret.New("$ecre!", secret.CustomRedact("HIDDEN"))
+	s = secret.New("$ecre!", secret.RedactHint("my redact hint"))
 	fmt.Println(s, s.Value())
-	// Output: HIDDEN $ecre!
+
+	// Output:
+	// XXXXX $ecre!
+	// [REDACTED] $ecre!
+	// my redact hint $ecre!
 }
 
 func ExampleText_MarshalText() {
@@ -52,6 +52,7 @@ func ExampleText_MarshalText() {
 	}
 
 	fmt.Println(string(bytes))
+
 	// Output: {"User":"John","Password":"*****"}
 }
 
@@ -68,6 +69,7 @@ func ExampleText_UnmarshalText() {
 
 	fmt.Printf("%+v\n", login)
 	fmt.Println(login.Password.Value())
+
 	// Output:
 	// {User:John Password:*****}
 	// $ecre!
@@ -79,6 +81,7 @@ func ExampleText_Equals() {
 	s3 := secret.New("hi")
 	fmt.Println(s1.Equals(s2))
 	fmt.Println(s1.Equals(s3))
+
 	// Output:
 	// true
 	// false
