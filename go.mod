@@ -1,3 +1,3 @@
-module github.com/rsjethani/secret/v2
+module github.com/rsjethani/secret/v3
 
 go 1.16
