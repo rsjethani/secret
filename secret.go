@@ -9,16 +9,16 @@ type Text struct {
 	redact *string
 }
 
-// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
-// the common redact hints provided with this package like [FiveX] or provide your own string.
-func RedactHint(r string) func(*Text) {
+// RedactAs is a functional option to set r as the redact string for [Text]. You can use one of
+// the common redact strings provided with this package like [FiveX] or provide your own.
+func RedactAs(r string) func(*Text) {
 	return func(t *Text) {
 		*t.redact = r
 	}
 }
 
-// New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
-// like [RedactHint] to modify default behavior.
+// New returns [Text] for the secret with [FiveStar] as the default redact string. Provide options
+// like [RedactAs] to modify default behavior.
 func New(secret string, options ...func(*Text)) Text {
 	tx := Text{
 		secret: new(string),
@@ -72,7 +72,7 @@ func (tx *Text) UnmarshalText(b []byte) error {
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if tx.redact != nil {
-		*tx = New(s, RedactHint(*tx.redact))
+		*tx = New(s, RedactAs(*tx.redact))
 	} else {
 		*tx = New(s)
 	}

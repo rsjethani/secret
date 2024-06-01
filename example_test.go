@@ -14,14 +14,14 @@ func ExampleNew() {
 	// Output: ***** $ecre!
 }
 
-func ExampleRedactHint() {
-	s := secret.New("$ecre!", secret.RedactHint(secret.FiveX))
+func ExampleRedactAs() {
+	s := secret.New("$ecre!", secret.RedactAs(secret.FiveX))
 	fmt.Println(s, s.Value())
 
-	s = secret.New("$ecre!", secret.RedactHint(secret.Redacted))
+	s = secret.New("$ecre!", secret.RedactAs(secret.Redacted))
 	fmt.Println(s, s.Value())
 
-	s = secret.New("$ecre!", secret.RedactHint("my redact hint"))
+	s = secret.New("$ecre!", secret.RedactAs("my redact hint"))
 	fmt.Println(s, s.Value())
 
 	// Output:
@@ -70,7 +70,7 @@ func ExampleText_UnmarshalText() {
 
 func ExampleEqual() {
 	tx1 := secret.New("hello")
-	tx2 := secret.New("hello", secret.RedactHint(secret.Redacted))
+	tx2 := secret.New("hello", secret.RedactAs(secret.Redacted))
 	tx3 := secret.New("world")
 	fmt.Println(secret.Equal(tx1, tx2))
 	fmt.Println(secret.Equal(tx1, tx3))
