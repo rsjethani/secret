@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/rsjethani/secret/v2"
+	"github.com/rsjethani/secret/v3"
 )
 
 func ExampleNew() {
