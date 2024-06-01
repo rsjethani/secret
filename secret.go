@@ -44,21 +44,21 @@ func RedactHint(r string) func(*Text) {
 	}
 }
 
-// String implements the [fmt.Stringer] interface and returns only the redact hint. This prevents the
-// secret value from being printed to std*, logs etc.
+// String implements the [fmt.Stringer] interface and returns only the redact string. This prevents
+// the actual secret string from being sent to std*, logs etc.
 func (tx Text) String() string {
-	if tx.redact == nil {
-		return FiveStar
+	if tx.redact != nil {
+		return *tx.redact
 	}
-	return *tx.redact
+	return FiveStar
 }
 
-// Value gives you access to the actual secret value stored inside Text.
+// Value gives you access to the secret string stored inside [Text].
 func (tx Text) Value() string {
-	if tx.secret == nil {
-		return ""
+	if tx.secret != nil {
+		return *tx.secret
 	}
-	return *tx.secret
+	return ""
 }
 
 // MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
