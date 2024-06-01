@@ -7,6 +7,13 @@ import (
 	"github.com/rsjethani/secret/v2"
 )
 
+func ExampleText() {
+	s := secret.Text{}
+	fmt.Println(s, s.Value())
+
+	// Output: *****
+}
+
 func ExampleNew() {
 	s := secret.New("$ecre!")
 	fmt.Println(s, s.Value())
@@ -14,14 +21,14 @@ func ExampleNew() {
 	// Output: ***** $ecre!
 }
 
-func ExampleText_WithRedact() {
-	s := secret.New("$ecre!").WithRedact(secret.FiveX)
+func ExampleRedactHint() {
+	s := secret.New("$ecre!", secret.RedactHint(secret.FiveX))
 	fmt.Println(s, s.Value())
 
-	s = secret.New("$ecre!").WithRedact(secret.Redacted)
+	s = secret.New("$ecre!", secret.RedactHint(secret.Redacted))
 	fmt.Println(s, s.Value())
 
-	s = secret.New("$ecre!").WithRedact("my redact hint")
+	s = secret.New("$ecre!", secret.RedactHint("my redact hint"))
 	fmt.Println(s, s.Value())
 
 	// Output:

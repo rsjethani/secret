@@ -13,17 +13,22 @@ type Text struct {
 	r *string
 }
 
-// New returns [Text] for the secret with [FiveStar] as the default redact hint.
-func New(secret string) Text {
-	sec := Text{
+// New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
+// like [RedactHint] to modify default behavior.
+func New(secret string, options ...func(*Text)) Text {
+	tx := Text{
 		v: new(string),
 		r: new(string),
 	}
 
-	*sec.v = secret
-	*sec.r = FiveStar
+	*tx.v = secret
+	*tx.r = FiveStar
 
-	return sec
+	for _, o := range options {
+		o(&tx)
+	}
+
+	return tx
 }
 
 // Some common redact hints.
@@ -33,35 +38,35 @@ const (
 	Redacted string = "[REDACTED]"
 )
 
-// WithRedact returns a copy of [Text] but with r as the redact string.
-// Some common redact hints like [FiveX] etc. are provided for convenience.
-func (tx Text) WithRedact(r string) Text {
-	tx2 := tx
-	*tx2.r = r
-	return tx2
+// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
+// the common redact hints provided with this package like [FiveX] or provide your own string.
+func RedactHint(r string) func(*Text) {
+	return func(t *Text) {
+		*t.r = r
+	}
 }
 
 // String implements the [fmt.Stringer] interface and returns only the redact hint. This prevents the
 // secret value from being printed to std*, logs etc.
-func (s Text) String() string {
-	if s.r == nil {
+func (tx Text) String() string {
+	if tx.r == nil {
 		return FiveStar
 	}
-	return *s.r
+	return *tx.r
 }
 
 // Value gives you access to the actual secret value stored inside Text.
-func (s Text) Value() string {
-	if s.v == nil {
+func (tx Text) Value() string {
+	if tx.v == nil {
 		return ""
 	}
-	return *s.v
+	return *tx.v
 }
 
 // MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
 // the actual secret value.
-func (s Text) MarshalText() ([]byte, error) {
-	return []byte(*s.r), nil
+func (tx Text) MarshalText() ([]byte, error) {
+	return []byte(tx.String()), nil
 }
 
 // UnmarshalText implements [encoding.TextUnmarshaler]. It unmarshals b into receiver's new secret
@@ -71,7 +76,7 @@ func (tx *Text) UnmarshalText(b []byte) error {
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if tx.r != nil {
-		*tx = New(s).WithRedact(*tx.r)
+		*tx = New(s, RedactHint(*tx.r))
 	} else {
 		*tx = New(s)
 	}
@@ -79,6 +84,6 @@ func (tx *Text) UnmarshalText(b []byte) error {
 }
 
 // Equals checks whether s2 has same secret string or not.
-func (s *Text) Equals(s2 Text) bool {
-	return *s.v == *s2.v
+func (tx *Text) Equals(s2 Text) bool {
+	return *tx.v == *s2.v
 }
