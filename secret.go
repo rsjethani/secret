@@ -1,18 +1,16 @@
-// Package secret provides types to guard your secret values from leaking into logs, std* etc.
-//
-// The objective is to disallow writing/serializing of secret values to std*, logs, JSON string
-// etc. but provide access to the secret when requested explicitly.
 package secret
 
-// Text provides a way to safely store your secret value and a corresponding redact hint. This
-// redact hint is what is used in operations like printing and serializing.
+// Text provides a way to safely store your secret string until you actually need it. Operations
+// like printing and serializing see a proxy/redact string there by avoiding leaking the secret.
+// Once created, the instance is readonly except for the [Text.UnmarshalText] operation, but that
+// too only modifies the local copy. Hence the type is concurrent safe.
 type Text struct {
 	secret *string
 	redact *string
 }
 
-// New returns [Text] for the secret with [FiveStar] as the default redact hint. Provide options
-// like [RedactHint] to modify default behavior.
+// New returns [Text] for the secret with [FiveStar] as the default redact string. Provide options
+// like [RedactAs] to modify default behavior.
 func New(secret string, options ...func(*Text)) Text {
 	tx := Text{
 		secret: new(string),
@@ -29,36 +27,36 @@ func New(secret string, options ...func(*Text)) Text {
 	return tx
 }
 
-// Some common redact hints.
+// RedactAs is a functional option to set r as the redact string for [Text]. You can use one of
+// the common redact strings provided with this package like [FiveX] or provide your own.
+func RedactAs(r string) func(*Text) {
+	return func(t *Text) {
+		*t.redact = r
+	}
+}
+
+// Some common redact strings.
 const (
 	FiveX    string = "XXXXX"
 	FiveStar string = "*****"
 	Redacted string = "[REDACTED]"
 )
 
-// RedactHint is a functional option to set r as the redact hint for the [Text]. You can use one of
-// the common redact hints provided with this package like [FiveX] or provide your own string.
-func RedactHint(r string) func(*Text) {
-	return func(t *Text) {
-		*t.redact = r
-	}
-}
-
-// String implements the [fmt.Stringer] interface and returns only the redact hint. This prevents the
-// secret value from being printed to std*, logs etc.
+// String implements the [fmt.Stringer] interface and returns only the redact string. This prevents
+// the actual secret string from being sent to std*, logs etc.
 func (tx Text) String() string {
-	if tx.redact == nil {
-		return FiveStar
+	if tx.redact != nil {
+		return *tx.redact
 	}
-	return *tx.redact
+	return FiveStar
 }
 
-// Value gives you access to the actual secret value stored inside Text.
-func (tx Text) Value() string {
-	if tx.secret == nil {
-		return ""
+// Secret returns the actual secret string stored inside [Text].
+func (tx Text) Secret() string {
+	if tx.secret != nil {
+		return *tx.secret
 	}
-	return *tx.secret
+	return ""
 }
 
 // MarshalText implements [encoding.TextMarshaler]. It marshals redact string into bytes rather than
@@ -74,7 +72,7 @@ func (tx *Text) UnmarshalText(b []byte) error {
 
 	// If the original redact is not nil then use it otherwise fallback to default.
 	if tx.redact != nil {
-		*tx = New(s, RedactHint(*tx.redact))
+		*tx = New(s, RedactAs(*tx.redact))
 	} else {
 		*tx = New(s)
 	}

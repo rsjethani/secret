@@ -7,29 +7,22 @@ import (
 	"github.com/rsjethani/secret/v2"
 )
 
-func ExampleText() {
-	s := secret.Text{}
-	fmt.Println(s, s.Value())
-
-	// Output: *****
-}
-
 func ExampleNew() {
 	s := secret.New("$ecre!")
-	fmt.Println(s, s.Value())
+	fmt.Println(s, s.Secret())
 
 	// Output: ***** $ecre!
 }
 
-func ExampleRedactHint() {
-	s := secret.New("$ecre!", secret.RedactHint(secret.FiveX))
-	fmt.Println(s, s.Value())
+func ExampleRedactAs() {
+	s := secret.New("$ecre!", secret.RedactAs(secret.FiveX))
+	fmt.Println(s, s.Secret())
 
-	s = secret.New("$ecre!", secret.RedactHint(secret.Redacted))
-	fmt.Println(s, s.Value())
+	s = secret.New("$ecre!", secret.RedactAs(secret.Redacted))
+	fmt.Println(s, s.Secret())
 
-	s = secret.New("$ecre!", secret.RedactHint("my redact hint"))
-	fmt.Println(s, s.Value())
+	s = secret.New("$ecre!", secret.RedactAs("my redact hint"))
+	fmt.Println(s, s.Secret())
 
 	// Output:
 	// XXXXX $ecre!
@@ -68,7 +61,7 @@ func ExampleText_UnmarshalText() {
 	}
 
 	fmt.Printf("%+v\n", login)
-	fmt.Println(login.Password.Value())
+	fmt.Println(login.Password.Secret())
 
 	// Output:
 	// {User:John Password:*****}
@@ -77,7 +70,7 @@ func ExampleText_UnmarshalText() {
 
 func ExampleEqual() {
 	tx1 := secret.New("hello")
-	tx2 := secret.New("hello", secret.RedactHint(secret.Redacted))
+	tx2 := secret.New("hello", secret.RedactAs(secret.Redacted))
 	tx3 := secret.New("world")
 	fmt.Println(secret.Equal(tx1, tx2))
 	fmt.Println(secret.Equal(tx1, tx3))
