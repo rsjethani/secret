@@ -79,7 +79,19 @@ func (tx *Text) UnmarshalText(b []byte) error {
 	return nil
 }
 
-// Equal returns true if both arguments have the same secret. The redact strings are not considered.
+// Equal returns true if both arguments have the same secret regardless of the redact strings.
 func Equal(tx1, tx2 Text) bool {
+	// If both pointers are equal then it means either both are nil or point to same value.
+	if tx1.secret == tx2.secret {
+		return true
+	}
+
+	// If we are here then it means the two pointers have different values hence return false
+	// if any one of them is nil.
+	if tx1.secret == nil || tx2.secret == nil {
+		return false
+	}
+
+	// If we are here then it means both pointers are not nil hence compare the values pointed by them.
 	return *tx1.secret == *tx2.secret
 }
