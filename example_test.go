@@ -69,13 +69,21 @@ func ExampleText_UnmarshalText() {
 }
 
 func ExampleEqual() {
-	tx1 := secret.New("hello")
-	tx2 := secret.New("hello", secret.RedactAs(secret.Redacted))
-	tx3 := secret.New("world")
-	fmt.Println(secret.Equal(tx1, tx2))
-	fmt.Println(secret.Equal(tx1, tx3))
+	// Empty Texts are equal.
+	fmt.Println(secret.Equal(secret.Text{}, secret.Text{}))
+
+	// Initialsed Text is not equal to an empty one.
+	fmt.Println(secret.Equal(secret.New("hello"), secret.Text{}))
+
+	// Texts with different secret strings are not equal.
+	fmt.Println(secret.Equal(secret.New("hello"), secret.New("world")))
+
+	// Texts with different redact strings but same secret string are equal.
+	fmt.Println(secret.Equal(secret.New("hello"), secret.New("hello", secret.RedactAs(secret.FiveX))))
 
 	// Output:
 	// true
 	// false
+	// false
+	// true
 }
